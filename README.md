@@ -31,3 +31,10 @@ SELECT * FROM launches LIMIT 10;
 # testes automatizados
 # github actions
 # scheduler diario
+
+
+# Melhorias
+
+- Expandir para os outros endpoints:
+   - rockets
+   - capsules

@@ -1,27 +1,30 @@
 import pandas as pd
-from sqlalchemy import create_engine
-from app.core.config import DB_URL
 
-engine = create_engine(DB_URL)
+from app.core.database import SessionLocal
+from app.repositories.launch_repository import LaunchRepository
 
 
 class QueryService:
 
     def get_launches(self, status=None, year=None, month=None):
-        df = pd.read_sql("SELECT * FROM launches", engine)
+        session = SessionLocal()
 
-        df["date_utc"] = pd.to_datetime(df["date_utc"], utc=True).dt.tz_localize(None)
+        try:
+            repo = LaunchRepository(session)
 
-        if status == "success":
-            df = df[df["success"] == True]
+            launches = repo.find_all(status, year, month)
 
-        elif status == "failed":
-            df = df[df["success"] == False]
+            data = [
+                {
+                    "id": item.id,
+                    "name": item.name,
+                    "date_utc": item.date_utc,
+                    "success": item.success,
+                }
+                for item in launches
+            ]
 
-        if year:
-            df = df[df["date_utc"].dt.year == year]
+            return pd.DataFrame(data)
 
-        if month:
-            df = df[df["date_utc"].dt.month == month]
-
-        return df
+        finally:
+            session.close()
