@@ -4,6 +4,12 @@ BASE_URL = "https://api.spacexdata.com/v4"
 
 
 class SpaceXClient:
+    
+    def get_launches(self):
+        return requests.get(f"{BASE_URL}/launches").json()
+    
+    def get_capules(self):
+        return requests.get(f"{BASE_URL}/capsules").json()
 
     def get_upcoming_launches(self):
         return requests.get(f"{BASE_URL}/launches/upcoming").json()
