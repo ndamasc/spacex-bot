@@ -56,7 +56,7 @@ jobs:
 
       - name: Generate sample report
         run: |
-          python -m app.main run
+          python -m app.main --month 9
 
       - name: Run E2E tests
         run: |
