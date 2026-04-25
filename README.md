@@ -25,13 +25,11 @@ uv run python -m app.main --status failed --month 3
 
 docker exec -it spacex_postgres psql -U postgres -d spacex_bot
 \dt
-SELECT * FROM launches LIMIT 10;
+SELECT * FROM launches;
 
 # report em html ou dashboard
 # testes automatizados
 # github actions
-# scheduler diario
-
 
 # Melhorias
 
