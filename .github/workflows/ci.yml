@@ -42,6 +42,29 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev]
 
+      - name: Seed database
+        run: |
+          python -m app.main sync
+
+      - name: Seed sample data
+        run: |
+          python - <<EOF
+          from app.core.database import SessionLocal
+          from app.models.launch import Launch
+          from datetime import datetime
+
+          db = SessionLocal()
+
+          db.add(Launch(
+              name="Falcon Test",
+              date_utc=datetime.utcnow(),
+              success=True
+          ))
+
+          db.commit()
+          db.close()
+          EOF
+
       - name: Install Playwright Browsers
         run: |
           python -m playwright install chromium

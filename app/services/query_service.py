@@ -3,16 +3,20 @@ import pandas as pd
 from app.core.database import SessionLocal
 from app.repositories.launch_repository import LaunchRepository
 
+columns = ["id", "name", "date_utc", "success"]
 
 class QueryService:
 
     def get_launches(self, status=None, year=None, month=None):
         session = SessionLocal()
-
+        
         try:
             repo = LaunchRepository(session)
 
             launches = repo.find_all(status, year, month)
+            
+            if not launches:
+                return pd.DataFrame(columns=columns)
 
             data = [
                 {
@@ -24,7 +28,7 @@ class QueryService:
                 for item in launches
             ]
 
-            return pd.DataFrame(data)
+            return pd.DataFrame(data, columns=columns)
 
         finally:
             session.close()
