@@ -30,6 +30,52 @@ class ReportService:
     def generate(self, df, metrics, status=None, year=None, month=None):
         Path("reports").mkdir(exist_ok=True)
 
+        if df.empty or "success" not in df.columns:
+            html = f"""
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <title>Spacex Launches Report</title>
+                <style>
+                    body {{
+                        background:#0f172a;
+                        color:white;
+                        font-family:Arial;
+                        padding:40px;
+                    }}
+
+                    .card {{
+                        background:#1e293b;
+                        padding:20px;
+                        border-radius:14px;
+                        display:inline-block;
+                        margin-right:12px;
+                        min-width:180px;
+                    }}
+                </style>
+            </head>
+
+            <body>
+                <h1>Spacex Launches Report</h1>
+
+                <div class="card">Total: {metrics["total"]}</div>
+                <div class="card">Success: {metrics["success"]}</div>
+                <div class="card">Failed: {metrics["failed"]}</div>
+                <div class="card">Rate: {metrics["rate"]}%</div>
+
+                <h2 style="margin-top:30px;">No data found for selected filters.</h2>
+            </body>
+            </html>
+            """
+
+            filename = self._build_filename(status, year, month)
+            filepath = f"reports/{filename}"
+
+            with open(filepath, "w", encoding="utf-8") as f:
+                f.write(html)
+
+            return filepath
+
         # -------- PIE --------
         pie_df = df["success"].value_counts(dropna=False).reset_index()
         pie_df.columns = ["status", "count"]

@@ -2,3 +2,7 @@
 .env
 __pycache__/
 *.pyc
+reports/
+*.html
+*.csv
+.pytest_cache/

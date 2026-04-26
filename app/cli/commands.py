@@ -5,7 +5,7 @@ from rich.table import Table
 from app.services.query_service import QueryService
 from app.services.metrics_service import MetricsService
 from app.services.report_service import ReportService
-
+from app.services.sync_service import SyncService
 
 app = typer.Typer()
 console = Console()
@@ -22,7 +22,6 @@ def run(
     report = ReportService()
 
     df = query.get_launches(status, year, month)
-
     metrics = metrics_service.build(df)
 
     html_file = report.generate(
@@ -34,7 +33,6 @@ def run(
     )
 
     table = Table(title="LaunchOps Summary")
-
     table.add_column("Metric")
     table.add_column("Value")
 
@@ -43,3 +41,9 @@ def run(
 
     console.print(table)
     console.print(f"[green]HTML:[/green] {html_file}")
+
+
+@app.command()
+def sync():
+    SyncService().run()
+    console.print("[green]Database synced successfully.[/green]")

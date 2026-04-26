@@ -1,0 +1,95 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, fixes ]
+  pull_request:
+    branches: [ main, fixes ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: spacex_bot
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d spacex_bot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DB_URL: postgresql://postgres:postgres@localhost:5432/spacex_bot
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[dev]
+
+      - name: Seed database
+        run: |
+          python -m app.main sync
+
+      - name: Seed sample data
+        run: |
+          python - <<EOF
+          from app.core.database import SessionLocal
+          from app.models.launch import Launch
+          from datetime import datetime
+
+          db = SessionLocal()
+
+          db.add(Launch(
+              name="Falcon Test",
+              date_utc=datetime.utcnow(),
+              success=True
+          ))
+
+          db.commit()
+          db.close()
+          EOF
+
+      - name: Install Playwright Browsers
+        run: |
+          python -m playwright install chromium
+
+      - name: Create database tables
+        run: |
+          python -c "from app.core.database import Base, engine; import app.models.launch; Base.metadata.create_all(bind=engine)"
+
+      - name: Run unit tests
+        run: |
+          pytest tests/unit
+
+      - name: Generate sample report
+        run: |
+          python -m app.main run --month 9
+
+      - name: Run E2E tests
+        run: |
+          pytest tests/e2e
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-and-screenshots
+          path: |
+            reports/
+            tests/artifacts/
