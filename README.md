@@ -1,38 +1,74 @@
+# 🚀 SpaceX Bot
 
+Automação em Python que consome a API pública da SpaceX, sincroniza dados no banco, gera relatórios e executa testes automatizados.
 
-# conseguir fazer:
+---
 
---status success
---status failed
---year 2024
---month 3
+# ✨ O que o projeto faz
 
+- Consulta dados reais da API da SpaceX
+- Salva lançamentos no PostgreSQL
+- Filtra lançamentos por status, ano e mês
+- Gera relatório HTML 
+- Testes automatizados
+- CI/CD com GitHub Actions
 
-# todos os lancamentos
-uv run python -m app.main
+---
 
-# somente falhas 
-uv run python -m app.main --status failed
+# 🧠 Stack
 
-# somente sucessos em 2022
-uv run python -m app.main --status success --year 2022
+- Python
+- Typer (CLI)
+- PostgreSQL
+- Pandas
+- Plotly
+- Pytest
+- Playwright
+- GitHub Actions
+- Docker
 
-# falhas em março
-uv run python -m app.main --status failed --month 3
+---
+# 📁 Estrutura
 
+```text
+spacex-bot
+├── app/
+|   ├── cli/
+|   ├── clients/
+|   ├── core/
+|   ├── models/
+|   ├── repositories/
+|   ├── services/
+|   └── main.py
+├── tests/
+├── reports/
+```
+---
 
-# Como verificar pelo banco
+# ▶️ Como rodar
 
-docker exec -it spacex_postgres psql -U postgres -d spacex_bot
-\dt
-SELECT * FROM launches;
+## Instalar dependências
+```bash
+pip install -r requirements.txt
+```
+## Sincronizar banco
+```bash
+sync
+docker compose up -d
+run python -m app.main sync
 
-# report em html ou dashboard
-# testes automatizados
-# github actions
+```
+## Pegar todos os lançamentos
+```bash
+uv run python -m app.main run
+```
 
-# Melhorias
+## Pegar lançamentos com sucesso em ano e mês especifico
+```bash
+uv run python -m app.main run --status success --month 9 --year 2020
+```
 
-- Expandir para os outros endpoints:
-   - rockets
-   - capsules
+## 🧪 Testes automatizados
+```bash
+uv run pytest -v
+```
