@@ -72,3 +72,12 @@ uv run python -m app.main run --status success --month 9 --year 2020
 ```bash
 uv run pytest -v
 ```
+
+🚀 Melhorias futuras
+
+- Expandir para outros endpoints da SpaceX:
+  - rockets
+  - capsules
+- Envio automático por e-mail
+- Scheduler diário
+- Deploy cloud
