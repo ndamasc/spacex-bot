@@ -13,6 +13,8 @@ class SyncService:
 
         db = SessionLocal()
 
+        inserted = 0
+
         try:
             for item in launches:
                 exists = db.query(Launch).filter(
@@ -32,7 +34,10 @@ class SyncService:
                     )
                 )
 
+                inserted += 1
+
             db.commit()
+            print(f"{inserted} launches inserted.")
 
         finally:
             db.close()

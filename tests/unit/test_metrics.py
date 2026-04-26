@@ -2,10 +2,14 @@ import pandas as pd
 from app.services.metrics_service import MetricsService
 
 
-def test_metrics_build():
-    df = pd.DataFrame({
-        "success": [True, True, False]
-    })
+def test_should_calculate_metrics():
+    df = pd.DataFrame(
+        [
+            {"success": True},
+            {"success": False},
+            {"success": True},
+        ]
+    )
 
     result = MetricsService().build(df)
 
