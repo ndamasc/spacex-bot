@@ -1,21 +1,22 @@
-from datetime import datetime
-
-from app.clients.spacex_client import SpaceXClient
-from app.core.database import SessionLocal
+from app.core.database import Base, engine
 from app.models.launch import Launch
+from app.core.database import SessionLocal
+from app.clients.spacex_client import SpaceXClient
 
 
 class SyncService:
 
     def run(self):
-        client = SpaceXClient()
-        launches = client.get_launches()
+        # cria tabelas se não existirem
+        Base.metadata.create_all(bind=engine)
 
         db = SessionLocal()
 
-        inserted = 0
-
         try:
+            launches = SpaceXClient().get_launches()
+
+            inserted = 0
+
             for item in launches:
                 exists = db.query(Launch).filter(
                     Launch.name == item["name"]
@@ -24,16 +25,13 @@ class SyncService:
                 if exists:
                     continue
 
-                db.add(
-                    Launch(
-                        name=item["name"],
-                        date_utc=datetime.fromisoformat(
-                            item["date_utc"].replace("Z", "+00:00")
-                        ),
-                        success=item["success"]
-                    )
+                row = Launch(
+                    name=item["name"],
+                    date_utc=item["date_utc"],
+                    success=item["success"]
                 )
 
+                db.add(row)
                 inserted += 1
 
             db.commit()
